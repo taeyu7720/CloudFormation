@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create a Transit Gateway and attach it to selected VPC.
+
+Parameters:
+  TGWName:
+    Description: Enter desired name of Transit Gateway
+    Type: String
+    Default: myTransitGateway
+  
+Resources:
+  TransitGateway01:
+    Type: AWS::EC2::TransitGateway
+    Properties:
+      AmazonSideAsn: 65000
+      Description: TGW Route Integration
+      AutoAcceptSharedAttachments: 'disable'
+      DefaultRouteTableAssociation: 'disable'
+      DnsSupport: 'enable'
+      VpnEcmpSupport: 'enable'
+      Tags:
+        -
+          Key: Name
+          Value: !Ref TGWName
+
+Outputs:
+  TGWID:
+    Description: Transit Gateway ID assigned to the VPC.
+    Value: !Ref TransitGateway01
+    Export:
+      Name: !Sub "${AWS::StackName}-TGW"
+

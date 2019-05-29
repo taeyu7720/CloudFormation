@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create a Transit Gateway Route Table.
+
+Parameters:
+  TGWRouteTableName:
+    Description: Name of TGW Route Table.
+    Type: String
+    Default: TGW Route Table Name
+  TGWStackName:
+    Description: Name of TGW Stack.
+    Type: String
+    Default: TGW Stack Name
+  TGWAttachmentStackName:
+    Description: Name of TGW Attachment Stack.
+    Type: String
+    Default: TGW Attachment Stack Name
+
+Resources:
+  TGWRouteTable01:
+    Type: AWS::EC2::TransitGatewayRouteTable
+    Properties:
+      Tags:
+        -
+          Key: Name
+          Value: !Ref TGWRouteTableName
+      TransitGatewayId:
+        Fn::ImportValue: 
+          !Sub "${TGWStackName}-TGW"
+
+  TGWRouteTableAssociation:
+    Type: AWS::EC2::TransitGatewayRouteTableAssociation
+    Properties:
+      TransitGatewayAttachmentId:
+        Fn::ImportValue:
+          !Sub "${TGWAttachmentStackName}-TGWAttachment"
+      TransitGatewayRouteTableId: !Ref TGWRouteTable01
+
+  TGWRouteTablePropagation:
+    Type: AWS::EC2::TransitGatewayRouteTablePropagation
+    Properties:
+      TransitGatewayAttachmentId:
+        Fn::ImportValue:
+          !Sub "${TGWAttachmentStackName}-TGWAttachment"
+      TransitGatewayRouteTableId: !Ref TGWRouteTable01
+
+  TGWRoute:
+    Type: AWS::EC2::TransitGatewayRoute
+    Properties:
+      Blackhole: 'false'
+      DestinationCidrBlock: '0.0.0.0/0'
+      TransitGatewayAttachmentId:
+        Fn::ImportValue:
+          !Sub "${TGWAttachmentStackName}-TGWAttachment"
+      TransitGatewayRouteTableId: !Ref TGWRouteTable01
+
+
+Outputs:
+  TGWRouteTableId:
+    Description: Transit Gateway Route Table ID .
+    Value: !Ref TGWRouteTable01
+    Export:
+      Name: !Sub "${AWS::StackName}-TGWRT"

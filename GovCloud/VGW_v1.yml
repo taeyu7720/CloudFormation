@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Creating VGW and attach to selected VPC
+
+Parameters:
+  ExistingVPC:
+    Description: Choose VPC where subnet will be created.
+    Type: 'AWS::EC2::VPC::Id'
+    Default: myVPC
+  VGWName:
+    Type: String
+    Default: myVGW 
+    Description: Enter desired name of Virtual Private Gateway
+  
+Resources: 
+  myVPNGateway: 
+    Type: AWS::EC2::VPNGateway
+    Properties: 
+      Type: ipsec.1
+      Tags: 
+        - 
+          Key: Name
+          Value: !Ref VGWName
+  AttachVGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref ExistingVPC
+      VpnGatewayId: !Ref myVPNGateway
+
+Outputs:
+  VGWID:
+    Description: Virtual Private Gateway Id
+    Value: !Ref myVPNGateway
+    Export:
+      Name: !Sub "${AWS::StackName}-VGW"

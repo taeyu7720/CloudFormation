@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Creating Route Table in selected VPC and associate subnet
+
+Parameters:
+  ExistingVPC:
+    Description: Choose VPC where subnet will be created.
+    Type: 'AWS::EC2::VPC::Id'
+    Default: myVPC
+  ExistingSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Default: mySubnet
+    Description: Choose a subnet to be associated with Route Table
+  ExistingSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Default: mySubnet
+    Description: Choose a subnet to be associated with Route Table
+  RTName:
+    Type: String
+    Default: myRouteTable
+    Description: Enter desired name of Route Table
+
+Resources:
+  RouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref ExistingVPC
+      Tags:
+        -
+          Key: Name
+          Value: !Ref RTName
+  
+  RoutTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      SubnetId: !Ref ExistingSubnet1
+  RoutTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      SubnetId: !Ref ExistingSubnet2
+
+Outputs:
+  RouteTableID:
+    Description: Route Table Id
+    Value: !Ref RouteTable1
+    Export:
+      Name: !Sub "${AWS::StackName}-RT"

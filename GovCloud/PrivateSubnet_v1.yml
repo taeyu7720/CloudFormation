@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create a subnet within an existing VPC
+
+Parameters:
+  ExistingVPC:
+    Description: Choose VPC where subnet will be created.
+    Type: 'AWS::EC2::VPC::Id'
+    Default: myVPC
+  CidrBlock:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: Enter desired IP range for the subnet. Must exist within VPC CIDR block.
+  SubnetName:
+    Type: String
+    Default: mySubnet
+    Description: Enter subnet name.
+  AvailabilityZone:
+    Description: Enter the desired Availability Zone for the subnet.
+    Type: 'AWS::EC2::AvailabilityZone::Name'
+#   RouteTable:
+#     Type: String
+#     Description: (Optional) Enter the Route Table to Associate with this subnet. Leave blank to assign the default Route Table for the VPC.
+
+# Conditions:
+#   HasRouteTable: 
+#     !Not [ !Equals ["" , !Ref RouteTable] ] #If RoutTable parameter is default, sets HasRouteTable to FALSE
+
+Resources:
+  Subnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      AvailabilityZone: !Ref AvailabilityZone
+      VpcId: !Ref ExistingVPC
+      CidrBlock: !Ref CidrBlock
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Ref SubnetName
+
+  # RouteTableAssociation:
+  #   Type: 'AWS::EC2::SubnetRouteTableAssociation'
+  #   Condition: HasRouteTable  #Only applies if HasRouteTable is TRUE
+  #   Properties:
+  #     SubnetId: !Ref Subnet
+  #     RouteTableId: !Ref RouteTable
+         
+Outputs:
+  SubnetID:
+    Description: Subnet Id
+    Value: !Ref Subnet
+    Export:
+      Name: !Sub "${AWS::StackName}-SubnetID"
+  SubnetName:
+    Description: Subnet Name
+    Value: !Ref SubnetName
+    Export:
+      Name: !Sub "${AWS::StackName}-SubnetName"
+  # NATGateway:
+  #   Description: NAT Gateway assigned to the VPC
+  #   Value: !Ref NATGateway
+  #   Export:
+  #     Name: !Sub "{AWS::StackName}-NAT"

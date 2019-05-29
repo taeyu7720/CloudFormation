@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create an IGW and attach it to selected VPC.  Also adds new route to selected Route Table.
+
+Parameters:
+  IGWName:
+    Description: Enter desired name of Internet Gateway
+    Type: String
+    Default: myIGW
+  ExistingVPC:
+    Description: Choose a VPC where Internet Gateway will be created.
+    Type: AWS::EC2::VPC::Id
+    Default: myVPC
+  ExistingRT:
+    Description: Choose a Route Table to be associated with IGW.
+    Type: String
+    Default: Enter Route Table ID
+
+Resources:
+  InternetGateway01:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - 
+          Key: Name
+          Value: !Ref IGWName
+  AttachIGW:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway01
+      VpcId: !Ref ExistingVPC
+  CreateIGWRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGateway01
+    Properties:
+      RouteTableId: !Ref ExistingRT
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway01
+
+Outputs:
+  IGWID:
+    Description: Internet Gateway ID assigned to the VPC.
+    Value: !Ref InternetGateway01
+    Export:
+      Name: !Sub "${AWS::StackName}-IGW"

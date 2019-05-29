@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create a Transit Gateway attachment and associate it with selected VPC.
+
+Parameters:
+  AttachmentName:
+    Description: Name of the attachment
+    Type: String
+    Default: TGW VPC Attachment 
+  ExistingSubnet:
+    Description: Select a Subnet 
+    Type: AWS::EC2::Subnet::Id
+  ExistingVPC:
+    Description: Select a VPC
+    Type: AWS::EC2::VPC::Id
+  TGWStackName:
+    Description: Name of TGW Stack
+    Type: String
+    Default: TGW Stack Name
+
+Resources:
+  CreateAttachment:
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      SubnetIds: 
+        - !Ref ExistingSubnet
+      TransitGatewayId: 
+        Fn::ImportValue: 
+          !Sub "${TGWStackName}-TGW"
+      VpcId: !Ref ExistingVPC
+      Tags:
+        - 
+          Key: Name
+          Value: !Ref AttachmentName
+
+Outputs:
+  TGWAttachment:
+    Description: Transit Gateway Attachment ID .
+    Value: !Ref CreateAttachment
+    Export:
+      Name: !Sub "${AWS::StackName}-TGWAttachment"
+  AttachedVPC:
+    Description: Attached VPC ID.
+    Value: !Ref ExistingVPC
+    Export:
+      Name: !Sub "${AWS::StackName}-AttachedVPC"
+  

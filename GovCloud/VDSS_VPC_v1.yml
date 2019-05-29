@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Create a VPC
+
+Parameters: 
+  CidrBlockRange:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: Enter desired CIDR block range no bigger than /16
+
+  Region:
+    Type: String
+    Default: us-gov-west-1
+    AllowedValues: [us-gov-east-1, us-gov-west-1]
+    Description: Enter desired region 
+
+  VPCName:
+    Type: String
+    Default: "myVPC"
+    Description: Enter VPC Name
+  
+Resources: 
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref CidrBlockRange
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref VPCName
+  
+  # VDSS does not require IGW since it will be connected Direct Connect
+  #      
+  # InternetGateway:
+  #   Type: AWS::EC2::InternetGateway
+  #   Properties:
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub "${VPCName}-IGW"
+
+  # AttachGateway:
+  #   Type: AWS::EC2::VPCGatewayAttachment
+  #   Properties:
+  #     VpcId: !Ref VPC
+  #     InternetGatewayId: !Ref InternetGateway
+
+Outputs:
+  VPCID:
+    Description: VPC ID assigned to the VPC.
+    Value: !Ref VPC
+    Export:
+      Name: !Sub "${AWS::StackName}-VPCID"
+  CIDR:
+    Description: CIDR block assigned to the VPC.
+    Value: !Ref CidrBlockRange 
+    Export: 
+      Name: !Sub "${AWS::StackName}-CIDR"
+      
+  # IGW:
+  #   Description: IGW associated to the VPC
+  #   Value: !Ref InternetGateway
+  #   Export: 
+  #     Name: !Sub "${AWS::StackName}-IGW"
+  
