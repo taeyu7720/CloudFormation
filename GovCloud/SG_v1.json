@@ -1,0 +1,56 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Create a Security Group with port 443, 22, 3389",
+    "Parameters": {
+        "SecurityGroupName": {
+            "Type": "String",
+            "Default": "mySecurityGroup",
+            "Description": "Enter SecurityGroup Name"
+        },
+        "SecurityGroupDescription": {
+            "Type": "String",
+            "Default": "mySGDescription",
+            "Description": "Enter description of Security Group"
+        },
+        "VPC": {
+            "Type": "AWS::EC2::VPC::VpcId",
+            "Description": "Select VPC ID"
+        }
+    },
+    "Resources": {
+        "SecurityGroup01": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupName": {
+                    "Ref": "SecurityGroupName"
+                },
+                "GroupDescription": {
+                    "Ref": "SecurityGroupDescription"
+                }
+            },
+            "SecurityGroupIngress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 443,
+                    "ToPort": 443,
+                    "CidrIp": "0.0.0.0/0"
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 22,
+                    "ToPort": 22,
+                    "CidrIp": "0.0.0.0/0"
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 3389,
+                    "ToPort": 3389,
+                    "CidrIp": "0.0.0.0/0"
+                }
+            ],
+            "VpcId": {
+                "Ref": "VPC"
+            }
+        }
+    }
+}
